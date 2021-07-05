@@ -15,13 +15,13 @@ const listContacts = async () => {
 
 const getContactById = async contactId => {
   try {
-    const getAll = await fs.readFile(contactsPath);
-    const parsed = JSON.parse(getAll);
-    const getId = parsed.filter(item => item.id === contactId);
+    const getAll = await listContacts();
+    const getId = getAll.filter(item => item.id === contactId);
 
-    // if (!getId) {
-    //   console.log('not Found');
+    // if (getId === []) {
+    //   console.log('Not Found');
     // }
+
     return getId;
   } catch (error) {
     throw error;
