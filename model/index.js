@@ -15,14 +15,14 @@ const listContacts = async () => {
 
 const getContactById = async contactId => {
   try {
-    const getAll = await listContacts();
-    return getAll.find(item => item.id === contactId);
+    const contacts = await listContacts();
+    return contacts.find(item => item.id === contactId);
   } catch (error) {
     throw error;
   }
 };
 
-const fileUpdator = data => {
+const fileUpdater = data => {
   try {
     const string = JSON.stringify(data);
     return fs.writeFile(contactsPath, string);
@@ -33,10 +33,11 @@ const fileUpdator = data => {
 
 const removeContact = async contactId => {
   try {
-    const getAll = await listContacts();
-    const getContacts = getAll.filter(item => item.id !== contactId);
-
-    await fileUpdator(getContacts);
+    const getAllContacts = await listContacts();
+    const getContacts = getAllContacts.filter(item => item.id !== contactId);
+    const contact = getAllContacts.find(item => item.id === contactId);
+    await fileUpdater(getContacts);
+    return contact;
   } catch (error) {
     throw error;
   }
@@ -46,8 +47,8 @@ const addContact = async body => {
   try {
     const contacts = await listContacts();
     const newContact = { id: v4(), ...body };
-    const addContacts = [...contacts, newContact];
-    await fileUpdator(addContacts);
+    const addToContacts = [...contacts, newContact];
+    await fileUpdater(addToContacts);
   } catch (error) {
     throw error;
   }
@@ -60,7 +61,9 @@ const updateContact = async (contactId, body) => {
     if (index === -1) return index;
 
     contacts[index] = { ...contacts[index], ...body };
-    await fileUpdator(contacts);
+    await fileUpdater(contacts);
+
+    return contacts[index];
   } catch (error) {
     throw error;
   }

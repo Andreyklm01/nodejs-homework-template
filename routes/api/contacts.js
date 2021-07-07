@@ -5,7 +5,7 @@ const model = require('../../model');
 router.get('/', async (req, res, next) => {
   try {
     const list = await model.listContacts();
-    res.json({ message: 'get contacts success', data: list });
+    res.status(200).json({ message: 'get contacts success', data: list });
   } catch (error) {
     error.message = 'Cannot get data';
   }
@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
 
     res
       .status(201)
-      .json({ message: `add ${body.name} success`, data: req.body });
+      .json({ message: `add ${body.name} success`, data: { body } });
   } catch (error) {
     error.message = 'Cannot post data';
   }
@@ -49,11 +49,10 @@ router.post('/', async (req, res, next) => {
 router.delete('/:contactId', async (req, res, next) => {
   const id = req.params.contactId;
   try {
-    const newList = await model.removeContact(+id);
-    // if (newList.includes(id)) {
-    //   return res.status(404).json({ message: 'Not found contact' });
-    // }
-    return res.status(200).json({ message: `remove id ${id} success` });
+    const deletedContact = await model.removeContact(+id);
+    return deletedContact
+      ? res.status(200).json({ message: `remove id ${id} success` })
+      : res.status(404).json({ message: 'ID not found' });
   } catch (error) {
     error.message = 'Cannot delete data';
   }
@@ -62,13 +61,17 @@ router.delete('/:contactId', async (req, res, next) => {
 router.patch('/:contactId', async (req, res, next) => {
   const id = req.params.contactId;
   const body = req.body;
+
   try {
     const updated = await model.updateContact(+id, body);
-    // console.log(body);
-    // if (body === {}) {
-    //   return res.status(400).json({ message: 'missing fields' });
-    // }
-    res.json({ message: 'Update success', data: body });
+
+    if (Object.keys(body).length === 0) {
+      return res.status(400).json({ message: 'missing fields' });
+    }
+
+    return updated === -1
+      ? res.status(400).json({ message: 'Incorrect ID' })
+      : res.status(200).json({ message: 'Update success', data: { body } });
   } catch (error) {
     error.message = 'Cannot update data';
   }
