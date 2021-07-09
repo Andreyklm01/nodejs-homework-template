@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const model = require('../../model');
+const contactsSchema = require('../../utils/schema');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -14,7 +15,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:contactId', async (req, res, next) => {
   const id = req.params.contactId;
   try {
-    const getOneContact = await model.getContactById(+id);
+    const getOneContact = await model.getContactById(id);
     if (!getOneContact) {
       return res.status(404).json({ message: 'Id not found' });
     }
@@ -25,22 +26,17 @@ router.get('/:contactId', async (req, res, next) => {
 });
 
 router.post('/', async (req, res, next) => {
-  const { name, email, phone } = req.body;
-  const body = {
-    name,
-    email,
-    phone,
-  };
+  const { error } = contactsSchema.validate(req.body);
   try {
-    await model.addContact(body);
+    await model.addContact(req.body);
 
-    if (!body.name || !body.email || !body.phone) {
+    if (error) {
       return res.status(400).json({ message: 'missing required name field' });
     }
 
     res
       .status(201)
-      .json({ message: `add ${body.name} success`, data: { body } });
+      .json({ message: `add ${req.body.name} success`, data: req.body });
   } catch (error) {
     error.message = 'Cannot post data';
   }
@@ -49,7 +45,7 @@ router.post('/', async (req, res, next) => {
 router.delete('/:contactId', async (req, res, next) => {
   const id = req.params.contactId;
   try {
-    const deletedContact = await model.removeContact(+id);
+    const deletedContact = await model.removeContact(id);
     return deletedContact
       ? res.status(200).json({ message: `remove id ${id} success` })
       : res.status(404).json({ message: 'ID not found' });
@@ -60,17 +56,20 @@ router.delete('/:contactId', async (req, res, next) => {
 
 router.patch('/:contactId', async (req, res, next) => {
   const id = req.params.contactId;
+
   const body = req.body;
 
-  try {
-    const updated = await model.updateContact(+id, body);
+  const { error } = contactsSchema.validate(body);
 
-    if (Object.keys(body).length === 0) {
+  try {
+    if (error) {
       return res.status(400).json({ message: 'missing fields' });
     }
 
+    const updated = await model.updateContact(id, body);
+
     return updated === -1
-      ? res.status(400).json({ message: 'Incorrect ID' })
+      ? res.status(404).json({ message: 'Incorrect ID' })
       : res.status(200).json({ message: 'Update success', data: { body } });
   } catch (error) {
     error.message = 'Cannot update data';
