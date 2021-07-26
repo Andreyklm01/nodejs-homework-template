@@ -6,9 +6,8 @@ const registr = async (req, res, next) => {
 
   const { error } = authValidateSchema.validate(req.body);
   if (error) {
-    const message = error.details.message;
     res.status(400).json({
-      status: 'Bad requst',
+      status: 'Bad request',
       code: 400,
       data: error.message,
     });
