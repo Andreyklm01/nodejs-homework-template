@@ -34,11 +34,6 @@ const registr = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    // res.status(400).json({
-    //   status: 'Error',
-    //   code: 400,
-    //   message: 'Bad request',
-    // });
   }
 };
 

@@ -1,4 +1,4 @@
-const { Schema } = require('mongoose');
+const { Schema, SchemaTypes } = require('mongoose');
 const user = require('../auth');
 
 const contactSchema = new Schema(
@@ -17,10 +17,10 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    // owner: {
-    //   type: SchemaTypes.ObjectId,
-    //   ref: 'user',
-    // },
+    owner: {
+      type: SchemaTypes.ObjectId,
+      ref: 'user',
+    },
   },
   { versionKey: false, timestamps: true },
 );

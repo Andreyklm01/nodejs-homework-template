@@ -1,34 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../../controllers/auth');
-// const { authenticate } = require('../../middlewares/authMiddlware');
-const passport = require('passport');
-require('../../configs/passport-config');
+const { authenticate } = require('../../middlewares/authMiddlware');
+
 router.post('/users/signup', ctrl.registr);
 router.post('/users/login', ctrl.login);
-
-// const authenticate = (req, res, next) => {
-//   passport.authenticate(
-//     'jwt',
-//     { session: false },
-//     (error, user) => {
-//       if (error || !user || !user.token) {
-//         res.status(401).json({
-//           status: 'error',
-//           code: 401,
-//           message: 'Unathorized',
-//         });
-//         return;
-//       }
-//       req.user = user;
-//       console.log(user);
-//       next();
-//     },
-//     (req, res, next),
-//   );
-// };
-
-// Не работает
-router.post('/users/logout', ctrl.logout);
+router.post('/users/logout', authenticate, ctrl.logout);
+router.get('/users/current', authenticate, ctrl.getCurrent);
 
 module.exports = router;
