@@ -7,6 +7,14 @@ const moment = require('moment');
 const authService = require('../../services/auth');
 
 const updateAvatar = async (req, res, next) => {
+  if (!req.file) {
+    return res.status(404).json({
+      status: 'error',
+      code: 404,
+      message: 'file not found',
+    });
+  }
+
   const { path: tempName, originalname } = req.file;
   const { _id } = req.user;
 
