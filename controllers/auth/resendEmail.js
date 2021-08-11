@@ -40,18 +40,17 @@ const resendEmail = async (req, res, next) => {
           Нажмите для подтверждения email
         </a>`,
     };
-    console.log(user.verificationToken);
 
     await sendMail(mail);
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'Success',
-      code: 201,
-      message: 'Registrtion success, need to verify email[2]',
+      code: 200,
+      message: 'Verification email sent',
     });
   } catch (error) {
     next(error);
   }
 };
-//ДОДЕЛАТЬ!!!!!!!
+
 module.exports = resendEmail;

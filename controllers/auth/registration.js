@@ -19,7 +19,7 @@ const registr = async (req, res, next) => {
   }
 
   const result = await userService.getOne({ email });
-  // console.log(result);
+
   if (result) {
     res.status(409).json({
       status: 'Conflict',
